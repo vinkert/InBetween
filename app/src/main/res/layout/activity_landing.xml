@@ -32,4 +32,17 @@
         app:srcCompat="@android:drawable/ic_menu_mylocation"
         app:backgroundTint="@android:color/background_light" />
 
+    <RelativeLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:gravity="center_vertical"
+        android:layout_height="wrap_content">
+        <EditText android:id="@+id/partnerLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Enter data"
+            android:background="@null"
+            />
+    </RelativeLayout>
+
 </android.support.design.widget.CoordinatorLayout>
