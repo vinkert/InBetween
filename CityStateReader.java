@@ -8,6 +8,8 @@ import java.util.List;
 
 public class CityStateReader {
     public static void main(String[] args)  {
+        //File to be parsed
+        //Format of each line: "City Name,State,United States"
         String dir = "C:\\dev\\projects\\CityStateParser\\data\\city_state.csv";
         BufferedReader br;
         String line;
@@ -28,6 +30,7 @@ public class CityStateReader {
                 else {
                     continue;
                 }
+                //Output format: City Name, State
                 writer.write(str.toString() + '\n');
                 cities.add(str.toString());
             }
