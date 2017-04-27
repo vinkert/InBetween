@@ -27,4 +27,14 @@ class Location {
         xyz.add(z);
         return xyz;
     }
+
+    private static Location findMiddleLoc(Location loc1, Location loc2) {
+        double averageX = (loc1.cartesian.get(0) + loc2.cartesian.get(0))/2;
+        double averageY = (loc1.cartesian.get(1) + loc2.cartesian.get(1))/2;
+        double averageZ = (loc1.cartesian.get(2) + loc2.cartesian.get(2))/2;
+        double longitude = Math.atan2(averageY, averageX);
+        double hypotenuse = Math.sqrt(averageX * averageX + averageY * averageY);
+        double latitude = Math.atan2(averageZ, hypotenuse);
+        return new Location(latitude, longitude);
+    }
 }
