@@ -16,7 +16,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -33,6 +44,16 @@ public class LandingActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         checkPermissions();
+        AutoCompleteTextView actv;
+        actv = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView1);
+        String[] arr = {"Hello", "World"};
+        List<String> locations = new ArrayList<String>();
+        //Loads in file of all city, state pairings in US
+        locations = populateLocations(R.raw.city_state);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locations);
+        actv.setAdapter(adapter);
+        actv.setThreshold(1);
+
         int permissionCheck = ContextCompat.checkSelfPermission(LandingActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
         int permissionCheck2 = ContextCompat.checkSelfPermission(LandingActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION);
         if(permissionCheck == PERMISSION_GRANTED && permissionCheck2 == PERMISSION_GRANTED) {
@@ -158,4 +179,26 @@ public class LandingActivity extends AppCompatActivity {
             Toast.makeText(LandingActivity.this, "GPS turned on", Toast.LENGTH_LONG).show();
         }
     }
+
+private List<String>  populateLocations(int resourceID){
+    List<String> result = new ArrayList<String>();
+    InputStream is = this.getResources().openRawResource(resourceID);
+    BufferedReader br = new BufferedReader(new InputStreamReader(is));
+    String readLine = null;
+
+    try {
+        // While the BufferedReader readLine is not null
+        while ((readLine = br.readLine()) != null) {
+            result.add(readLine);
+        }
+        // Close the InputStream and BufferedReader
+        is.close();
+        br.close();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    return result;
+}
 }
