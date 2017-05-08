@@ -19,6 +19,8 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
+import android.location.Geocoder;
+
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,11 +29,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class LandingActivity extends AppCompatActivity {
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.autoCompleteTextView1) AutoCompleteTextView actv;
+    @BindView(R.id.fab) FloatingActionButton fab;
     protected LocationManager locationManager;
     //in meters
     private static final long MINIMUM_DISTANCE_FOR_UPDATE = 1;
@@ -41,12 +49,11 @@ public class LandingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         checkPermissions();
-        AutoCompleteTextView actv;
-        actv = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView1);
-        String[] arr = {"Hello", "World"};
+        //http://stackoverflow.com/questions/26703211/android-autocomplete-matching-options
+        //Currently the matching matches within the entire string, not with just only the beginning of string
         List<String> locations = new ArrayList<String>();
         //Loads in file of all city, state pairings in US
         locations = populateLocations(R.raw.city_state);
@@ -60,14 +67,6 @@ public class LandingActivity extends AppCompatActivity {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MINIMUM_TIME_FOR_UPDATE, MINIMUM_DISTANCE_FOR_UPDATE, new LocListener());
         }
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                showCurrentLocation();
-            }
-        });
     }
     int asdf;
     int asdff;
@@ -200,5 +199,10 @@ private List<String>  populateLocations(int resourceID){
     }
 
     return result;
+}
+
+@OnClick(R.id.fab)
+public void toastLocation(){
+    showCurrentLocation();
 }
 }
