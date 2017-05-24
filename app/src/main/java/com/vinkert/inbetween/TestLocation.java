@@ -6,7 +6,7 @@ package com.vinkert.inbetween;
 
 public class TestLocation {
     public static void main(String[] args)  {
-        Location loc = new Location(0.710599509, -1.291647896);
+        MiddleLocation loc = new MiddleLocation(0.710599509, -1.291647896);
         for(Double temp: loc.cartesian)
             System.out.println(temp);
     }

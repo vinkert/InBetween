@@ -31,7 +31,7 @@
         app:backgroundTint="@android:color/background_light" />
 
     <Button
-        android:text="Button"
+        android:text="Submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button"
@@ -53,6 +53,14 @@
             android:layout_marginTop="65dp"
             android:ems="10"/>
 
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="95dp"
+            android:ems="10"/>
         <include layout="@layout/content_landing"
             android:layout_alignTop="@+id/autoCompleteTextView1"
             android:layout_alignParentLeft="true"
