@@ -1,6 +1,7 @@
 package com.vinkert.inbetween;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -51,24 +52,48 @@ public class ChoiceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choice);
         Intent intent = getIntent();
-        String lat = intent.getStringExtra("lat");
-        String longit = intent.getStringExtra("longit");
+        Double lat = intent.getDoubleExtra("lat",0);
+        Double longit = intent.getDoubleExtra("longit",0);
         System.out.println(lat + "  asdfasdf  " + longit);
-        try {
-            YelpFusionApiFactory apiFactory = new YelpFusionApiFactory();
-            YelpFusionApi yelpFusionApi = apiFactory.createAPI("insert", "api key here");
-            Map<String, String> params = new HashMap<>();
-            //Fremont
-            params.put("term", "indian food");
-            params.put("latitude", "37.5483");
-            params.put("longitude", "-121.9886");
-            Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
-            Response<SearchResponse> response = call.execute();
-            System.out.println(" asdfasdfasdf " + response.toString());
+        class RetrieveResults extends AsyncTask<Double, Void, Response<SearchResponse>> {
+            Response<SearchResponse> response;
+            protected Response<SearchResponse> doInBackground(Double... doubles) {
+                try
 
-        }catch(Exception e) {
-            e.printStackTrace();
+                {
+                    YelpFusionApiFactory apiFactory = new YelpFusionApiFactory();
+                    YelpFusionApi yelpFusionApi = apiFactory.createAPI(); //Insert API key here
+                    Map<String, String> params = new HashMap<>();
+                    //Fremont
+                    params.put("term", "Indian food");
+                    //params.put("latitude", "37.5483");
+                    //params.put("longitude", "-121.9886");
+                    params.put("latitude", "40.58114");
+                    params.put("longitude", "-111.914184");
+                    //Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
+                    Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
+                    Response<SearchResponse> response = call.execute();
+                    SearchResponse searchResponse = response.body();
+                    int total = searchResponse.getTotal();
+                    System.out.println(" asdfasdfasdf " + total);
+                    return response;
+                } catch (
+                        Exception e
+                        )
+
+                {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+            protected void onPostExecute(Response<SearchResponse> resp)   {
+                SearchResponse searchResponse = resp.body();
+                int total = searchResponse.getTotal();
+                System.out.println(" asdfasdfasdf " + total);
+            }
         }
+        new RetrieveResults().execute(lat, longit);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
