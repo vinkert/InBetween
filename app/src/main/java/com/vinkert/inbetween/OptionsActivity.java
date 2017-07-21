@@ -1,7 +1,5 @@
 package com.vinkert.inbetween;
 
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,20 +18,13 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
-import com.yelp.fusion.client.connection.YelpFusionApi;
-import com.yelp.fusion.client.connection.YelpFusionApiFactory;
 import com.yelp.fusion.client.models.Business;
-import com.yelp.fusion.client.models.SearchResponse;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Response;
-//Pretty much loading screen, add a loading symbol or something later.
-public class ChoiceActivity extends AppCompatActivity {
+public class OptionsActivity extends AppCompatActivity {
 
+    public static ArrayList<Business> businesses = null;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -52,66 +43,7 @@ public class ChoiceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_choice);
-        Intent intent = getIntent();
-        Double lat = intent.getDoubleExtra("lat",0);
-        Double longit = intent.getDoubleExtra("longit",0);
-        System.out.println(lat + "  asdfasdf  " + longit);
-        class RetrieveResults extends AsyncTask<Double, Void, Response<SearchResponse>> {
-            Response<SearchResponse> response;
-            protected Response<SearchResponse> doInBackground(Double... doubles) {
-                try
-
-                {
-                    YelpFusionApiFactory apiFactory = new YelpFusionApiFactory();
-                    YelpFusionApi yelpFusionApi = apiFactory.createAPI(); //Insert API key here
-                    Map<String, String> params = new HashMap<>();
-                    //Fremont
-                    params.put("term", "Indian food");
-                    //params.put("latitude", "37.5483");
-                    //params.put("longitude", "-121.9886");
-                    params.put("latitude", "40.58114");
-                    params.put("longitude", "-111.914184");
-                    //Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
-                    Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
-                    Response<SearchResponse> response = call.execute();
-                    SearchResponse searchResponse = response.body();
-                    int total = searchResponse.getTotal();
-                    System.out.println(" asdfasdfasdf " + total);
-
-                    return response;
-                } catch (
-                        Exception e
-                        )
-
-                {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-            protected void onPostExecute(Response<SearchResponse> resp)   {
-                double lowerBound = 4.0; //Lowest rating possible that will be displayed
-                SearchResponse searchResponse = resp.body();
-                int total = searchResponse.getTotal();
-                searchResponse.getBusinesses();
-                ArrayList<Business> businessList = searchResponse.getBusinesses();
-                businessList = pruneBusinesses(businessList, lowerBound);
-                OptionsActivity.businesses = businessList;
-                Intent optionsIntent = new Intent(ChoiceActivity.this, OptionsActivity.class);
-
-                //ArrayList<String> imageList = new ArrayList<String>(businessList.size());
-//                for(Business b: businessList) {
-//                    System.out.println(b.getName() + " " + b.getRating() + "\n" + b.getUrl());
-//                    imageList.add(b.getImageUrl());
-//                    //ArrayList<String> temp = b.getLocation().getDisplayAddress();
-//                    //for(String str: temp)
-//                        //System.out.println(str);
-//                }
-                //optionsIntent.putExtra("businesses", businessList);
-                ChoiceActivity.this.startActivity(optionsIntent);
-            }
-        }
-        new RetrieveResults().execute(lat, longit);
+        setContentView(R.layout.activity_options);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -122,8 +54,10 @@ public class ChoiceActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
-
+        //BusinessWrapper wrap = (BusinessWrapper) getIntent().getSerializableExtra("businesses");
+//        ArrayList<Business> businesses = (ArrayList<Business>) getIntent().getSerializableExtra("business");
+//        for(Business b: businesses)
+//            System.out.println(b.getName() + " " + b.getRating());
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,28 +66,16 @@ public class ChoiceActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
+        for(Business b: businesses) {
+            System.out.println(b.getName() + " " + b.getRating() + "\n" + b.getUrl());
+        }
     }
 
-
-    //Look back at this later, seems inefficient
-    private ArrayList<Business> pruneBusinesses(ArrayList<Business> businessList, double lowerBound)   {
-        ArrayList<Business> deleteList = new ArrayList<Business>();
-        for(Business b : businessList) {
-            if (b.getRating() < lowerBound)  {
-                deleteList.add(b);
-            }
-        }
-        for(Business b : deleteList)    {
-            businessList.remove(b);
-        }
-        return businessList;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_choice, menu);
+        getMenuInflater().inflate(R.menu.menu_options, menu);
         return true;
     }
 
@@ -200,7 +122,7 @@ public class ChoiceActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_choice, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_options, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
