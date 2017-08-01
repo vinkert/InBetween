@@ -64,7 +64,7 @@ public class ChoiceActivity extends AppCompatActivity {
 
                 {
                     YelpFusionApiFactory apiFactory = new YelpFusionApiFactory();
-                    YelpFusionApi yelpFusionApi = apiFactory.createAPI(); //Insert API key here
+                    YelpFusionApi yelpFusionApi = apiFactory.createAPI(""); //Insert API key here
                     Map<String, String> params = new HashMap<>();
                     //Fremont
                     params.put("term", "Indian food");

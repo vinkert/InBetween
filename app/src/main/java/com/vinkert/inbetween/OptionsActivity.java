@@ -1,5 +1,8 @@
 package com.vinkert.inbetween;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,21 +13,25 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yelp.fusion.client.models.Business;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class OptionsActivity extends AppCompatActivity {
 
     public static ArrayList<Business> businesses = null;
+    private static ArrayList<String> businessImageURL = new ArrayList<String>();
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -68,6 +75,7 @@ public class OptionsActivity extends AppCompatActivity {
         });
         for(Business b: businesses) {
             System.out.println(b.getName() + " " + b.getRating() + "\n" + b.getUrl());
+            businessImageURL.add(b.getImageUrl());
         }
     }
 
@@ -124,8 +132,42 @@ public class OptionsActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_options, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+//            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            Business b = businesses.get(getArguments().getInt(ARG_SECTION_NUMBER) - 1);
+            textView.setText(b.getName());
+            ImageView imageView = (ImageView) rootView.findViewById(R.id.coverImage);
+            setRatingsView((ImageView) rootView.findViewById(R.id.ratingsImage), b);
+            //imageView.setImageResource(R.mipmap.ic_launcher);
+            //new DownloadImageTask(imageView)
+            //        .execute("https://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png");
+            new DownloadImageTask(imageView)
+                    .execute(b.getImageUrl());
             return rootView;
+        }
+        private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+            ImageView bmImage;
+
+            public DownloadImageTask(ImageView bmImage) {
+                this.bmImage = bmImage;
+            }
+
+            protected Bitmap doInBackground(String... urls) {
+                String urldisplay = urls[0];
+                Bitmap mIcon11 = null;
+                try {
+                    InputStream in = new java.net.URL(urldisplay).openStream();
+                    System.out.println(urldisplay);
+                    mIcon11 = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                    e.printStackTrace();
+                }
+                return mIcon11;
+            }
+
+            protected void onPostExecute(Bitmap result) {
+                bmImage.setImageBitmap(result);
+            }
         }
     }
 
@@ -149,20 +191,29 @@ public class OptionsActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return businesses.size();
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
-            }
-            return null;
-        }
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            switch (position) {
+//                case 0:
+//                    return "SECTION 1";
+//                case 1:
+//                    return "SECTION 2";
+//                case 2:
+//                    return "SECTION 3";
+//            }
+//            //return null;
+//        }
+    }
+    private static void setRatingsView (ImageView img, Business b) {
+        double rating = b.getRating();
+        if(rating == 4.0)
+            img.setImageResource(R.mipmap.four);
+        else if(rating == 4.5)
+            img.setImageResource(R.mipmap.four_half);
+        else if(rating == 5.0)
+            img.setImageResource(R.mipmap.five_stars);
     }
 }
