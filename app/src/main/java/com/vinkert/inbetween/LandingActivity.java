@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.location.Geocoder;
 
@@ -45,7 +46,8 @@ public class LandingActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.autoCompleteTextView1) AutoCompleteTextView location1;
     @BindView(R.id.autoCompleteTextView2) AutoCompleteTextView location2;
-    @BindView(R.id.fab) FloatingActionButton fab;
+    @BindView(R.id.query) EditText searchQuery;
+    //@BindView(R.id.fab) FloatingActionButton fab;
     @BindView(R.id.button) Button button;
     protected LocationManager locationManager;
     //in meters
@@ -257,12 +259,14 @@ private List<String>  populateLocations(int resourceID){
 public void toastLocation(){
     String firstEntry = location1.getText().toString();
     String secondEntry = location2.getText().toString();
-    if(firstEntry.isEmpty() || secondEntry.isEmpty())   {
+    String search = searchQuery.getText().toString();
+    if(firstEntry.isEmpty() || secondEntry.isEmpty() || search.isEmpty())   {
         Toast.makeText(LandingActivity.this, "Please make sure both locations are filled in.", Toast.LENGTH_LONG).show();
     }
     else {
         Toast.makeText(LandingActivity.this, firstEntry, Toast.LENGTH_LONG).show();
         Toast.makeText(LandingActivity.this, secondEntry, Toast.LENGTH_LONG).show();
+        Toast.makeText(LandingActivity.this, search, Toast.LENGTH_LONG).show();
         MiddleLocation location1 = ConvertCitytoLatLong(firstEntry);
         MiddleLocation location2 = ConvertCitytoLatLong(secondEntry);
         MiddleLocation loc1 = MiddleLocation.findMiddleLoc(location1, location2);
@@ -277,6 +281,7 @@ public void toastLocation(){
             Intent choiceIntent = new Intent(LandingActivity.this, ChoiceActivity.class);
             choiceIntent.putExtra("lat", loc1.latitude);
             choiceIntent.putExtra("longit", loc1.longitude);
+            choiceIntent.putExtra("search", search);
             LandingActivity.this.startActivity(choiceIntent);
         }catch (Exception e)    {
             e.printStackTrace();

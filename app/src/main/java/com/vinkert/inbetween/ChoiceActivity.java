@@ -54,8 +54,9 @@ public class ChoiceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choice);
         Intent intent = getIntent();
-        Double lat = intent.getDoubleExtra("lat",0);
-        Double longit = intent.getDoubleExtra("longit",0);
+        final Double lat = intent.getDoubleExtra("lat",0);
+        final Double longit = intent.getDoubleExtra("longit",0);
+        final String search = intent.getStringExtra("search");
         System.out.println(lat + "  asdfasdf  " + longit);
         class RetrieveResults extends AsyncTask<Double, Void, Response<SearchResponse>> {
             Response<SearchResponse> response;
@@ -64,14 +65,15 @@ public class ChoiceActivity extends AppCompatActivity {
 
                 {
                     YelpFusionApiFactory apiFactory = new YelpFusionApiFactory();
-                    YelpFusionApi yelpFusionApi = apiFactory.createAPI(""); //Insert API key here
+                    YelpFusionApi yelpFusionApi = apiFactory.createAPI(); //Insert API key here
                     Map<String, String> params = new HashMap<>();
                     //Fremont
-                    params.put("term", "Indian food");
-                    //params.put("latitude", "37.5483");
-                    //params.put("longitude", "-121.9886");
-                    params.put("latitude", "40.58114");
-                    params.put("longitude", "-111.914184");
+                    params.put("term", search);
+                    //params.put("term", "Indian food");
+//                    params.put("latitude", "40.58114");
+//                    params.put("longitude", "-111.914184");
+                    params.put("latitude", lat.toString());
+                    params.put("longitude", longit.toString());
                     //Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
                     Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
                     Response<SearchResponse> response = call.execute();

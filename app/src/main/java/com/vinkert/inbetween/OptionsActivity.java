@@ -1,7 +1,9 @@
 package com.vinkert.inbetween;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -26,7 +28,12 @@ import android.widget.TextView;
 import com.yelp.fusion.client.models.Business;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+
+import butterknife.OnClick;
 
 public class OptionsActivity extends AppCompatActivity {
 
@@ -132,9 +139,25 @@ public class OptionsActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_options, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            TextView distTV = (TextView) rootView.findViewById(R.id.distance);
 //            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            Business b = businesses.get(getArguments().getInt(ARG_SECTION_NUMBER) - 1);
+            final Business b = businesses.get(getArguments().getInt(ARG_SECTION_NUMBER) - 1);
             textView.setText(b.getName());
+            double dist = b.getDistance()/1609.34;
+            BigDecimal dec = new BigDecimal(dist);
+            dec = dec.setScale(1, RoundingMode.HALF_UP);
+            distTV.setText(dec + " mi");
+            ImageView yelpLogo = (ImageView) rootView.findViewById(R.id.yelp_logo);
+            yelpLogo.setImageResource(R.drawable.yelp_logo);
+            yelpLogo.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v){
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    intent.setData(Uri.parse(b.getUrl()));
+                    startActivity(intent);
+                }
+            });
             ImageView imageView = (ImageView) rootView.findViewById(R.id.coverImage);
             setRatingsView((ImageView) rootView.findViewById(R.id.ratingsImage), b);
             //imageView.setImageResource(R.mipmap.ic_launcher);
@@ -207,13 +230,14 @@ public class OptionsActivity extends AppCompatActivity {
 //            //return null;
 //        }
     }
+
     private static void setRatingsView (ImageView img, Business b) {
         double rating = b.getRating();
         if(rating == 4.0)
-            img.setImageResource(R.mipmap.four);
+            img.setImageResource(R.drawable.stars_extra_large_4);
         else if(rating == 4.5)
-            img.setImageResource(R.mipmap.four_half);
+            img.setImageResource(R.drawable.stars_extra_large_4_half);
         else if(rating == 5.0)
-            img.setImageResource(R.mipmap.five_stars);
+            img.setImageResource(R.drawable.stars_extra_large_5);
     }
 }
