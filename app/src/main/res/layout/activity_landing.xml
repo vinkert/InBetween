@@ -42,7 +42,8 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="65dp"
-            android:ems="10"/>
+            android:ems="10"
+            android:hint="Where are you?"/>
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextView2"
@@ -51,7 +52,8 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="95dp"
-            android:ems="10"/>
+            android:ems="10"
+            android:hint="Where is your friend?"/>
         <include layout="@layout/content_landing"
             android:layout_alignTop="@+id/autoCompleteTextView1"
             android:layout_alignParentLeft="true"

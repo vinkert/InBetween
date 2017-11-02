@@ -1,5 +1,8 @@
 package com.vinkert.inbetween;
 
+//TODO: drag and drop each location's title to the action bar then save it there as a bookmark (allows users to populate list of possible places)
+
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -68,18 +71,15 @@ public class OptionsActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+//        ActionBar actionBar = getActionBar();
+//        actionBar.setTitle("");
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         //BusinessWrapper wrap = (BusinessWrapper) getIntent().getSerializableExtra("businesses");
 //        ArrayList<Business> businesses = (ArrayList<Business>) getIntent().getSerializableExtra("business");
 //        for(Business b: businesses)
 //            System.out.println(b.getName() + " " + b.getRating());
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         for(Business b: businesses) {
             System.out.println(b.getName() + " " + b.getRating() + "\n" + b.getUrl());
             businessImageURL.add(b.getImageUrl());

@@ -57,7 +57,6 @@ public class ChoiceActivity extends AppCompatActivity {
         final Double lat = intent.getDoubleExtra("lat",0);
         final Double longit = intent.getDoubleExtra("longit",0);
         final String search = intent.getStringExtra("search");
-        System.out.println(lat + "  asdfasdf  " + longit);
         class RetrieveResults extends AsyncTask<Double, Void, Response<SearchResponse>> {
             Response<SearchResponse> response;
             protected Response<SearchResponse> doInBackground(Double... doubles) {
