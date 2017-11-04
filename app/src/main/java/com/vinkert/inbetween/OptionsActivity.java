@@ -1,7 +1,7 @@
 package com.vinkert.inbetween;
 
 //TODO: drag and drop each location's title to the action bar then save it there as a bookmark (allows users to populate list of possible places)
-
+//TODO: figure out how to make sectionpageadapter not take up full screen to add space for above feature (e.g. swiping left on bottom does not change page)
 import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -74,14 +74,13 @@ public class OptionsActivity extends AppCompatActivity {
 //        ActionBar actionBar = getActionBar();
 //        actionBar.setTitle("");
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         //BusinessWrapper wrap = (BusinessWrapper) getIntent().getSerializableExtra("businesses");
 //        ArrayList<Business> businesses = (ArrayList<Business>) getIntent().getSerializableExtra("business");
 //        for(Business b: businesses)
 //            System.out.println(b.getName() + " " + b.getRating());
 
         for(Business b: businesses) {
-            System.out.println(b.getName() + " " + b.getRating() + "\n" + b.getUrl());
+            //System.out.println(b.getName() + " " + b.getRating() + "\n" + b.getUrl());
             businessImageURL.add(b.getImageUrl());
         }
     }

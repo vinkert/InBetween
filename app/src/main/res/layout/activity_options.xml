@@ -33,4 +33,12 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <FrameLayout
+        android:id="@+id/storage"
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/container">
+    </FrameLayout>
+
 </android.support.design.widget.CoordinatorLayout>
