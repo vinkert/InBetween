@@ -1,7 +1,7 @@
 package com.vinkert.inbetween;
-
-//TODO: drag and drop each location's title to the action bar then save it there as a bookmark (allows users to populate list of possible places)
-//TODO: figure out how to make sectionpageadapter not take up full screen to add space for above feature (e.g. swiping left on bottom does not change page)
+//Something that was tough to figure out - the onTouchListener (BookmarkListener) was returning true in reaction to gestures, and returning true blocked the gesture from being sent to the next step of the pagaer which let it change pages
+//This caused the Viewpager to not be able to change pages smoothly
+//TODO: Animate drag and drop of saving locations to bookmarks, via DragEvent
 import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,13 +19,18 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.yelp.fusion.client.models.Business;
@@ -35,56 +40,115 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 
+import butterknife.BindView;
 import butterknife.OnClick;
 
 public class OptionsActivity extends AppCompatActivity {
 
     public static ArrayList<Business> businesses = null;
     private static ArrayList<String> businessImageURL = new ArrayList<String>();
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
+    private GestureDetector bookmarkDetector; //For fling down action
+    private String currentBusiness;
     private ViewPager mViewPager;
+    private HashSet<String> businessSet;
+    private int currentPosition;
+    View.OnTouchListener touchListener = new View.OnTouchListener()   {
+        @Override
+        public boolean onTouch(View v, MotionEvent event)   {
+            return bookmarkDetector.onTouchEvent(event);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        final int numBusinesses = businesses.size();
+        businessSet = new HashSet<>(numBusinesses);
+        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-//        ActionBar actionBar = getActionBar();
-//        actionBar.setTitle("");
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        //BusinessWrapper wrap = (BusinessWrapper) getIntent().getSerializableExtra("businesses");
-//        ArrayList<Business> businesses = (ArrayList<Business>) getIntent().getSerializableExtra("business");
-//        for(Business b: businesses)
-//            System.out.println(b.getName() + " " + b.getRating());
+        actionBar.setTitle(1 + " of " + numBusinesses + " locations");
+        currentBusiness = businesses.get(0).getName();
+        currentPosition = 0;
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                currentBusiness = businesses.get(position).getName();
+                currentPosition = position;
+                actionBar.setTitle(position + 1 + " of " + numBusinesses + " locations");
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        bookmarkDetector = new GestureDetector(this, new BookmarkDetector());
+        mViewPager.setOnTouchListener(touchListener);
+
+
 
         for(Business b: businesses) {
             //System.out.println(b.getName() + " " + b.getRating() + "\n" + b.getUrl());
             businessImageURL.add(b.getImageUrl());
         }
     }
+    class BookmarkDetector extends GestureDetector.SimpleOnGestureListener {
 
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            if(getSlope(event1.getX(), event1.getY(), event2.getX(),event2.getY()) == 3) {
+                if(!businessSet.contains(currentBusiness)) {
+                    businessSet.add(currentBusiness);
+                    Button button = new Button(getApplicationContext());
+                    button.setText(currentBusiness);
+                    final int businessNumber = currentPosition;
+                    button.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            mViewPager.setCurrentItem(businessNumber);
+                        }
+                    });
+                    LinearLayout horizScrollBar = (LinearLayout) findViewById(R.id.scrollbar);
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    horizScrollBar.addView(button, lp);
+                }
+
+            }
+            return false;
+        }
+    }
+    private int getSlope(float x1, float y1, float x2, float y2) {
+        Double angle = Math.toDegrees(Math.atan2(y1 - y2, x2 - x1));
+        if (angle > 45 && angle <= 135)
+            // top
+            return 1;
+        if (angle >= 135 && angle < 180 || angle < -135 && angle > -180)
+            // left
+            return 2;
+        if (angle < -45 && angle>= -135)
+            // down
+            return 3;
+        if (angle > -45 && angle <= 45)
+            // right
+            return 4;
+        return 0;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -99,7 +163,6 @@ public class OptionsActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -178,7 +241,6 @@ public class OptionsActivity extends AppCompatActivity {
                 Bitmap mIcon11 = null;
                 try {
                     InputStream in = new java.net.URL(urldisplay).openStream();
-                    System.out.println(urldisplay);
                     mIcon11 = BitmapFactory.decodeStream(in);
                 } catch (Exception e) {
                     Log.e("Error", e.getMessage());
@@ -191,12 +253,11 @@ public class OptionsActivity extends AppCompatActivity {
                 bmImage.setImageBitmap(result);
             }
         }
+
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
+
+
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {

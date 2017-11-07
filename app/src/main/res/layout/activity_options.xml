@@ -30,15 +30,21 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="439dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <FrameLayout
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="11dp"
+        android:background="@android:color/darker_gray" />
+
+    <fragment
         android:id="@+id/storage"
-        android:layout_width="fill_parent"
-        android:layout_height="150dp"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/container">
-    </FrameLayout>
+        android:name="com.vinkert.inbetween.StorageBarFragment"
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:layout_gravity="bottom"
+        android:layout_weight="2"
+        app:layout_anchorGravity="bottom" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -63,6 +63,9 @@ public class ChoiceActivity extends AppCompatActivity {
                 try
 
                 {
+
+                    String clientID;
+                    String clientSecret;
                     YelpFusionApiFactory apiFactory = new YelpFusionApiFactory();
                     YelpFusionApi yelpFusionApi = apiFactory.createAPI(); //Insert API key here
                     Map<String, String> params = new HashMap<>();
