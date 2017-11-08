@@ -32,8 +32,11 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yelp.fusion.client.models.Business;
+
+import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -55,6 +58,8 @@ public class OptionsActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private HashSet<String> businessSet;
     private int currentPosition;
+
+
     View.OnTouchListener touchListener = new View.OnTouchListener()   {
         @Override
         public boolean onTouch(View v, MotionEvent event)   {
@@ -164,7 +169,8 @@ public class OptionsActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_tips) {
+            Toast.makeText(OptionsActivity.this, "Try swiping down to save a location to bookmarks!", Toast.LENGTH_LONG).show();
             return true;
         }
 
@@ -205,10 +211,10 @@ public class OptionsActivity extends AppCompatActivity {
 //            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             final Business b = businesses.get(getArguments().getInt(ARG_SECTION_NUMBER) - 1);
             textView.setText(b.getName());
-            double dist = b.getDistance()/1609.34;
-            BigDecimal dec = new BigDecimal(dist);
-            dec = dec.setScale(1, RoundingMode.HALF_UP);
-            distTV.setText(dec + " mi");
+//            double dist = b.getDistance()/1609.34;
+//            BigDecimal dec = new BigDecimal(dist);
+//            dec = dec.setScale(1, RoundingMode.HALF_UP);
+//            distTV.setText(dec + " mi");
             ImageView yelpLogo = (ImageView) rootView.findViewById(R.id.yelp_logo);
             yelpLogo.setImageResource(R.drawable.yelp_logo);
             yelpLogo.setOnClickListener(new View.OnClickListener(){
@@ -222,9 +228,15 @@ public class OptionsActivity extends AppCompatActivity {
             });
             ImageView imageView = (ImageView) rootView.findViewById(R.id.coverImage);
             setRatingsView((ImageView) rootView.findViewById(R.id.ratingsImage), b);
-            //imageView.setImageResource(R.mipmap.ic_launcher);
-            //new DownloadImageTask(imageView)
-            //        .execute("https://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png");
+            TextView addressView = (TextView) rootView.findViewById(R.id.address);
+            addressView.setText("\n" + b.getLocation().getAddress1() + "\n" + b.getLocation().getCity() + ", " + b.getLocation().getState() + " " + b.getLocation().getZipCode());
+            addressView.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v){
+                    String map = "http://maps.google.co.in/maps?q=" + b.getLocation().getAddress1() + b.getLocation().getCity() + ", " + b.getLocation().getState() + " " + b.getLocation().getZipCode();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
+                    startActivity(intent);
+                }
+            });
             new DownloadImageTask(imageView)
                     .execute(b.getImageUrl());
             return rootView;
@@ -273,7 +285,6 @@ public class OptionsActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return businesses.size();
         }
 

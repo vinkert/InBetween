@@ -33,10 +33,6 @@
         android:layout_height="439dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <View
-        android:layout_width="wrap_content"
-        android:layout_height="11dp"
-        android:background="@android:color/darker_gray" />
 
     <fragment
         android:id="@+id/storage"

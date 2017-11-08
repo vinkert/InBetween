@@ -264,9 +264,6 @@ public void toastLocation(){
         Toast.makeText(LandingActivity.this, "Please make sure both locations are filled in.", Toast.LENGTH_LONG).show();
     }
     else {
-        Toast.makeText(LandingActivity.this, firstEntry, Toast.LENGTH_LONG).show();
-        Toast.makeText(LandingActivity.this, secondEntry, Toast.LENGTH_LONG).show();
-        Toast.makeText(LandingActivity.this, search, Toast.LENGTH_LONG).show();
         MiddleLocation location1 = ConvertCitytoLatLong(firstEntry);
         MiddleLocation location2 = ConvertCitytoLatLong(secondEntry);
         MiddleLocation loc1 = MiddleLocation.findMiddleLoc(location1, location2);
@@ -277,7 +274,6 @@ public void toastLocation(){
         try {
             //System.out.println(loc1.latitude + "   " + loc1.longitude);
             address = coder.getFromLocation(loc1.latitude,loc1.longitude,5);
-            Toast.makeText(LandingActivity.this,address.get(0).getLocality(), Toast.LENGTH_LONG).show();
             Intent choiceIntent = new Intent(LandingActivity.this, ChoiceActivity.class);
             choiceIntent.putExtra("lat", loc1.latitude);
             choiceIntent.putExtra("longit", loc1.longitude);
