@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.vinkert.inbetween.LandingActivity">
+    tools:context="com.vinkert.inbetween.LandingActivity"
+    android:background="@drawable/landing_background">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -27,7 +28,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/button"
         app:layout_anchorGravity="center_vertical|center_horizontal"
-        android:layout_gravity="center_vertical|center_horizontal" />
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:background="@drawable/button_border"
+        android:textColor="@color/white"/>
 
     <RelativeLayout
         android:id="@+id/footer"
@@ -43,7 +46,12 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="65dp"
             android:ems="10"
-            android:hint="Where are you?"/>
+            android:hint="Where are you?"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:background="@drawable/button_border"
+            android:textCursorDrawable="@color/white"
+            />
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextView2"
@@ -51,13 +59,15 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="95dp"
+            android:layout_marginTop="105dp"
+            android:background="@drawable/button_border"
             android:ems="10"
-            android:hint="Where is your friend?"/>
-        <include layout="@layout/content_landing"
-            android:layout_alignTop="@+id/autoCompleteTextView1"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:hint="Where is your friend?"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@color/white"
+
+            />
 
         <EditText
             android:id="@+id/query"
@@ -69,7 +79,11 @@
             android:layout_marginTop="11dp"
             android:ems="10"
             android:hint="e.g. try 'Chinese food'"
-            android:inputType="text" />
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:inputType="text"
+            android:background="@drawable/button_border"
+            android:textCursorDrawable="@color/white"/>
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -6,6 +6,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +20,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -122,8 +124,10 @@ public class OptionsActivity extends AppCompatActivity {
                 if(!businessSet.contains(currentBusiness)) {
                     businessSet.add(currentBusiness);
                     Button button = new Button(getApplicationContext());
+                    //ContextThemeWrapper buttonWrapper = new ContextThemeWrapper(getApplicationContext(), R.drawable.button_border)
                     button.setText(currentBusiness);
                     final int businessNumber = currentPosition;
+                    button.setTextColor(Color.WHITE);
                     button.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
                             mViewPager.setCurrentItem(businessNumber);
@@ -207,8 +211,6 @@ public class OptionsActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_options, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            TextView distTV = (TextView) rootView.findViewById(R.id.distance);
-//            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             final Business b = businesses.get(getArguments().getInt(ARG_SECTION_NUMBER) - 1);
             textView.setText(b.getName());
 //            double dist = b.getDistance()/1609.34;

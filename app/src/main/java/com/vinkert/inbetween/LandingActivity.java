@@ -4,12 +4,16 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,9 +21,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -28,17 +36,27 @@ import android.widget.Toast;
 import android.location.Geocoder;
 
 
+import com.yelp.fusion.client.connection.YelpFusionApi;
+import com.yelp.fusion.client.connection.YelpFusionApiFactory;
+import com.yelp.fusion.client.models.Business;
+import com.yelp.fusion.client.models.SearchResponse;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTouch;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -47,6 +65,7 @@ public class LandingActivity extends AppCompatActivity {
     @BindView(R.id.autoCompleteTextView1) AutoCompleteTextView location1;
     @BindView(R.id.autoCompleteTextView2) AutoCompleteTextView location2;
     @BindView(R.id.query) EditText searchQuery;
+
     //@BindView(R.id.fab) FloatingActionButton fab;
     @BindView(R.id.button) Button button;
     protected LocationManager locationManager;
@@ -60,7 +79,10 @@ public class LandingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_landing);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        getSupportActionBar().hide();
+        Window window = getWindow();
         checkPermissions();
+        buttonEffect(findViewById(R.id.button));
         //http://stackoverflow.com/questions/26703211/android-autocomplete-matching-options
         //Currently the matching matches within the entire string, not with just only the beginning of string
         List<String> locations = new ArrayList<String>();
@@ -85,6 +107,80 @@ public class LandingActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MINIMUM_TIME_FOR_UPDATE, MINIMUM_DISTANCE_FOR_UPDATE, new LocListener());
         }
     }
+
+    private void transitionToOptions(final double lat, final double longit, final String search)  {
+        class RetrieveResults extends AsyncTask<Double, Void, Response<SearchResponse>> {
+            Response<SearchResponse> response;
+            protected Response<SearchResponse> doInBackground(Double... doubles) {
+                try
+
+                {
+
+                    String clientID;
+                    String clientSecret;
+                    YelpFusionApiFactory apiFactory = new YelpFusionApiFactory();
+                    YelpFusionApi yelpFusionApi = apiFactory.createAPI(""); //Insert API key here
+                    Map<String, String> params = new HashMap<>();
+                    //Fremont
+                    params.put("term", search);
+                    //params.put("term", "Indian food");
+//                    params.put("latitude", "40.58114");
+//                    params.put("longitude", "-111.914184");
+                    params.put("latitude", lat + "");
+                    params.put("longitude", longit + "");
+                    //Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
+                    Call<SearchResponse> call = yelpFusionApi.getBusinessSearch(params);
+                    Response<SearchResponse> response = call.execute();
+                    SearchResponse searchResponse = response.body();
+                    int total = searchResponse.getTotal();
+                    return response;
+                } catch (
+                        Exception e
+                        )
+
+                {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+            protected void onPostExecute(Response<SearchResponse> resp)   {
+                double lowerBound = 4.0; //Lowest rating possible that will be displayed
+                SearchResponse searchResponse = resp.body();
+                int total = searchResponse.getTotal();
+                searchResponse.getBusinesses();
+                ArrayList<Business> businessList = searchResponse.getBusinesses();
+                businessList = pruneBusinesses(businessList, lowerBound);
+                OptionsActivity.businesses = businessList;
+                Intent optionsIntent = new Intent(LandingActivity.this, OptionsActivity.class);
+
+                //ArrayList<String> imageList = new ArrayList<String>(businessList.size());
+//                for(Business b: businessList) {
+//                    System.out.println(b.getName() + " " + b.getRating() + "\n" + b.getUrl());
+//                    imageList.add(b.getImageUrl());
+//                    //ArrayList<String> temp = b.getLocation().getDisplayAddress();
+//                    //for(String str: temp)
+//                        //System.out.println(str);
+//                }
+                //optionsIntent.putExtra("businesses", businessList);
+                LandingActivity.this.startActivity(optionsIntent);
+            }
+        }
+        new RetrieveResults().execute(lat, longit);
+    }
+
+    private ArrayList<Business> pruneBusinesses(ArrayList<Business> businessList, double lowerBound)   {
+        ArrayList<Business> deleteList = new ArrayList<Business>();
+        for(Business b : businessList) {
+            if (b.getRating() < lowerBound)  {
+                deleteList.add(b);
+            }
+        }
+        for(Business b : deleteList)    {
+            businessList.remove(b);
+        }
+        return businessList;
+    }
+
     int asdf;
     int asdff;
     protected void checkPermissions()   {
@@ -187,7 +283,6 @@ public class LandingActivity extends AppCompatActivity {
             if(location != null) {
                 String loc = String.format("Longitude: %1$s \n Latitude: %2$s",
                         location.getLongitude(), location.getLatitude());
-                //Toast.makeText(LandingActivity.this, loc, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -255,6 +350,28 @@ private List<String>  populateLocations(int resourceID){
     return result;
 }
 
+public static void buttonEffect(View button){
+        button.setOnTouchListener(new View.OnTouchListener() {
+
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        v.getBackground().setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
+                        v.invalidate();
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        v.getBackground().clearColorFilter();
+                        v.invalidate();
+                        break;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+
 @OnClick(R.id.button)
 public void toastLocation(){
     String firstEntry = location1.getText().toString();
@@ -274,11 +391,7 @@ public void toastLocation(){
         try {
             //System.out.println(loc1.latitude + "   " + loc1.longitude);
             address = coder.getFromLocation(loc1.latitude,loc1.longitude,5);
-            Intent choiceIntent = new Intent(LandingActivity.this, ChoiceActivity.class);
-            choiceIntent.putExtra("lat", loc1.latitude);
-            choiceIntent.putExtra("longit", loc1.longitude);
-            choiceIntent.putExtra("search", search);
-            LandingActivity.this.startActivity(choiceIntent);
+            transitionToOptions(loc1.latitude, loc1.longitude, search);
         }catch (Exception e)    {
             e.printStackTrace();
         }
